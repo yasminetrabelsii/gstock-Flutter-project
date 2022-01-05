@@ -5,6 +5,8 @@ import 'package:gstock/Models/members.dart';
 import 'package:gstock/components/appbar_widget.dart';
 import 'package:gstock/constants.dart';
 
+import 'edit/edit_member_screen.dart';
+
 class MembersListScreen extends StatefulWidget {
   const MembersListScreen({Key? key}) : super(key: key);
 
@@ -24,7 +26,7 @@ class _MembersListScreenState extends State<MembersListScreen> {
             builder:
                 (BuildContext context, AsyncSnapshot<List<Members>> snapshot) {
               if (!snapshot.hasData) {
-                return const Center(child: Text('Loading...'));
+                return const Center(child: CircularProgressIndicator(color: kPrimaryColor,));
               }
               return snapshot.data!.isEmpty
                   ? const Center(child: Text('No Members in List.'))
@@ -32,6 +34,13 @@ class _MembersListScreenState extends State<MembersListScreen> {
                       children: snapshot.data!.map((member) {
                         return Center(
                           child: ListTile(
+                            onLongPress: (){
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MemberEditScreen(member: member,)),
+                              );
+                            },
                             title: Text(
                                 "First Name :${member.firstName},Last Name:${member.lastName}"),
                             subtitle: Text(member.adresse),

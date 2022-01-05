@@ -3,15 +3,17 @@ class Admin {
   late String userName;
   late String email;
   late String password;
+  late String adminImage;
 
-  Admin(this.userName, this.email, this.password,{this.adminId});
+  Admin(this.userName, this.email, this.password,this.adminImage,{this.adminId});
 
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
       'adminId': adminId,
       'userName': userName,
       'email': email,
-      'password': password
+      'password': password,
+      'adminImage':adminImage
     };
     return map;
   }
@@ -21,5 +23,6 @@ class Admin {
     userName = map['userName'];
     email = map['email'];
     password = map['password'];
+    adminImage = map['adminImage'];
   }
 }

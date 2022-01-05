@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gstock/DatabaseHandler/loans/db_loans_operation.dart';
 import 'package:gstock/Models/loans.dart';
@@ -26,7 +29,10 @@ class _LoanListScreenState extends State<LoanListScreen> {
             builder: (BuildContext context,
                 AsyncSnapshot<List<Map<String, Object?>>> snapshot) {
               if (!snapshot.hasData) {
-                return const Center(child: Text('Loading...'));
+                return const Center(
+                    child: CircularProgressIndicator(
+                  color: kPrimaryColor,
+                ));
               }
               return snapshot.data!.isEmpty
                   ? const Center(child: Text('No Loans in List.'))
@@ -44,7 +50,10 @@ class _LoanListScreenState extends State<LoanListScreen> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        'Loans ID '+Loans.fromMap(data).loanId.toString(),
+                                        'Loans ID ' +
+                                            Loans.fromMap(data)
+                                                .loanId
+                                                .toString(),
                                         style: const TextStyle(
                                             fontWeight: FontWeight.bold,
                                             letterSpacing: 3.0),
@@ -58,14 +67,25 @@ class _LoanListScreenState extends State<LoanListScreen> {
                                               Icons.clear,
                                               color: Colors.red,
                                             ),
-                                      SizedBox(height: size.height * 0.03),
-                                      // const CircleAvatar(
-                                      //     radius: 60,
-                                      //     backgroundImage: AssetImage(
-                                      //         'assets/images/user.png'),
-                                      //     backgroundColor: Colors.transparent),
-                                      // SizedBox(height: size.height * 0.03),
+
                                     ],
+                                  ),
+                                ),
+                                SizedBox(height: size.height * 0.03),
+                                Ink.image(
+                                  image: MemoryImage(base64Decode(
+                                      Product.fromMap(data).productImage)),
+                                  fit: BoxFit.fitWidth,
+                                  height: 200,
+                                ),
+                                SizedBox(height: size.height * 0.03),
+                                Text(
+                                  Product.fromMap(data).productTitle,
+                                  style: const TextStyle(
+                                    color: kPrimaryColor,
+                                    fontSize: 18.0,
+                                    fontWeight: FontWeight.w400,
+                                    letterSpacing: 1.0,
                                   ),
                                 ),
                                 const Divider(
@@ -139,25 +159,6 @@ class _LoanListScreenState extends State<LoanListScreen> {
                                 SizedBox(height: size.height * 0.03),
                                 Row(
                                   children: <Widget>[
-                                    const Icon(
-                                      Icons.laptop,
-                                      color: kPrimaryColor,
-                                    ),
-                                    const SizedBox(width: 10.0),
-                                    Text(
-                                      Product.fromMap(data).productTitle,
-                                      style: const TextStyle(
-                                        color: kPrimaryColor,
-                                        fontSize: 18.0,
-                                        fontWeight: FontWeight.w400,
-                                        letterSpacing: 1.0,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: size.height * 0.03),
-                                Row(
-                                  children: <Widget>[
                                     const Text(
                                       "Nombre Of pieces : ",
                                       style: TextStyle(
@@ -169,7 +170,9 @@ class _LoanListScreenState extends State<LoanListScreen> {
                                     ),
                                     const SizedBox(width: 10.0),
                                     Text(
-                                      Loans.fromMap(data).loanQuantity.toString(),
+                                      Loans.fromMap(data)
+                                          .loanQuantity
+                                          .toString(),
                                       style: const TextStyle(
                                         color: kPrimaryColor,
                                         fontSize: 18.0,

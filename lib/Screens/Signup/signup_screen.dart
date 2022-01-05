@@ -3,6 +3,7 @@ import 'package:gstock/DatabaseHandler/admin/db_admin_operation.dart';
 import 'package:gstock/Models/admin.dart';
 import 'package:gstock/components/alert_dialog.dart';
 import 'package:gstock/components/already_have_an_account_acheck.dart';
+import 'package:gstock/components/image_picker.dart';
 import 'package:gstock/components/rounded_button.dart';
 import 'package:gstock/components/rounded_input_field.dart';
 import 'package:gstock/components/rounded_password_field.dart';
@@ -22,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final passwordController = TextEditingController();
   final cpassword = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  String? _imageFileBase64;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       String password = passwordController.text;
       if(_formKey.currentState!.validate()){
       _formKey.currentState!.save();
-        Admin admin = Admin(username, email, password);
+        Admin admin = Admin(username, email, password,_imageFileBase64!);
         await DbAdmin.instance.saveAdminData(admin).then((adminData) {
           Navigator.pushNamedAndRemoveUntil(
               context, route.loginScreen, (Route<dynamic> route) => false);
@@ -53,10 +55,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image.asset(
-                  "assets/images/signup.png",
-                  height: size.height * 0.2,
-                ),
+                ImagePickerWidget(callback: (String imageFileBase64) {setState(() {
+                  _imageFileBase64 = imageFileBase64;
+                });},),
                 SizedBox(height: size.height * 0.02),
                 RoundedInputField(
                   controller: usernameController,
@@ -75,7 +76,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 SizedBox(height: size.height * 0.03),
                 RoundedPasswordField(
                   controller: passwordController,
-                  onChanged: (value) {},
                 ),
                 RoundedButton(
                   text: "SIGNUP",

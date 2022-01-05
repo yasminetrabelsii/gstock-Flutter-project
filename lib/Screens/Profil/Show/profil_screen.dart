@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:gstock/Models/admin.dart';
@@ -29,7 +31,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
     return Scaffold(
       appBar: buildAppBar(
         context,
-        "My Profil",
+        "My Profile",
         action: IconButton(
           icon: const Icon(Icons.edit),
           onPressed: () {
@@ -45,10 +47,10 @@ class _ProfilScreenState extends State<ProfilScreen> {
             children: <Widget>[
               Center(
                 child: Column(
-                  children: const [
+                  children: [
                     CircleAvatar(
                         radius: 100,
-                        backgroundImage: AssetImage('assets/images/user.png'),
+                        backgroundImage: MemoryImage(base64Decode(admin.adminImage)),
                         backgroundColor: Colors.transparent),
                   ],
                 ),

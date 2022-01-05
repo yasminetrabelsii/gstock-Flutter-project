@@ -66,7 +66,7 @@ Route<dynamic> controller(RouteSettings settings) {
     case loanAddScreen:
       return MaterialPageRoute(builder: (context) => const LoanAddScreen());
     case memberEditScreen:
-      return MaterialPageRoute(builder: (context) => const MemberEditScreen());
+      return MaterialPageRoute(builder: (context) => MemberEditScreen());
     case loanListScreen:
       return MaterialPageRoute(builder: (context) => const LoanListScreen());
     case loanBackAddScreen:

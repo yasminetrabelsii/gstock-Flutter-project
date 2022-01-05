@@ -4,8 +4,9 @@ class Product {
   late int? categoryId;
   late int quantity;
   late DateTime purchaseDate;
+  late String productImage;
 
-  Product(this.productTitle, this.categoryId, this.quantity, this.purchaseDate,
+  Product(this.productTitle, this.categoryId, this.quantity, this.purchaseDate,this.productImage,
       {this.productId});
   Map<String, dynamic> toMap() {
     var map = <String, dynamic>{
@@ -13,7 +14,8 @@ class Product {
       'productTitle': productTitle,
       'categoryId': categoryId,
       'quantity': quantity,
-      'purchaseDate': purchaseDate.toIso8601String()
+      'purchaseDate': purchaseDate.toIso8601String(),
+      'productImage' : productImage,
     };
     return map;
   }
@@ -24,5 +26,6 @@ class Product {
     categoryId = map['categoryId'];
     quantity = map['quantity'];
     purchaseDate = DateTime.parse(map['purchaseDate']);
+    productImage = map['productImage'];
   }
 }

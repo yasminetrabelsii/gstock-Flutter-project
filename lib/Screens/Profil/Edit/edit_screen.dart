@@ -3,6 +3,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:gstock/DatabaseHandler/admin/db_admin_operation.dart';
 import 'package:gstock/Models/admin.dart';
 import 'package:gstock/components/alert_dialog.dart';
+import 'package:gstock/components/image_picker.dart';
 import 'package:gstock/components/rounded_button.dart';
 import 'package:gstock/components/rounded_input_field.dart';
 import 'package:gstock/components/rounded_password_field.dart';
@@ -19,11 +20,12 @@ class EditProfilScreen extends StatefulWidget {
 
 class _EditProfilScreenState extends State<EditProfilScreen> {
   GetStorage loginStorage = GetStorage(storeAdmin);
-  late Admin admin;
+  late Admin admin ;
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final cpassword = TextEditingController();
+  String? _imageFileBase64;
   final _formKey = GlobalKey<FormState>();
   @override
   void initState() {
@@ -41,6 +43,9 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
       admin.email=emailController.text;
       admin.userName=usernameController.text;
       admin.password=passwordController.text;
+      if(_imageFileBase64 !=null) {
+        admin.adminImage=_imageFileBase64!;
+      }
       await DbAdmin.instance.updateAdmin(admin).then((adminDta) {
         loginStorage.write(adminData, admin.toMap());
         Navigator.pushNamedAndRemoveUntil(
@@ -54,7 +59,7 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: buildAppBar(context, "Edit Profil"),
+      appBar: buildAppBar(context, "Edit Profile"),
       body: SingleChildScrollView(
         child: Center(
           child: Form(
@@ -63,10 +68,9 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SizedBox(height: size.height * 0.03),
-                const CircleAvatar(
-                    radius: 100,
-                    backgroundImage: AssetImage('assets/images/user.png'),
-                    backgroundColor: Colors.transparent),
+                ImagePickerWidget(imageFileBase64: admin.adminImage,isEdit: true,callback: (String imageFileBase64) {setState(() {
+                  _imageFileBase64 = imageFileBase64;
+                });},),
                 SizedBox(height: size.height * 0.03),
                 RoundedInputField(
                   controller: usernameController,
@@ -83,7 +87,6 @@ class _EditProfilScreenState extends State<EditProfilScreen> {
                 SizedBox(height: size.height * 0.03),
                 RoundedPasswordField(
                   controller: passwordController,
-                  onChanged: (value) {},
                 ),
                 RoundedButton(
                   text: "UPDATE",

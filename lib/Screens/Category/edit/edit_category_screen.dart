@@ -7,26 +7,31 @@ import 'package:gstock/components/rounded_input_field.dart';
 import 'package:gstock/components/appbar_widget.dart';
 import 'package:gstock/routes/route.dart' as route;
 
-class CategoryAddScreen extends StatefulWidget {
-  const CategoryAddScreen({Key? key}) : super(key: key);
-
+class CategoryEditScreen extends StatefulWidget {
+  late Category category;
+   CategoryEditScreen({Key? key,required this.category}) : super(key: key);
   @override
-  State<CategoryAddScreen> createState() => _CategoryAddScreenState();
+  State<CategoryEditScreen> createState() => _CategoryEditScreenState();
 }
-
-class _CategoryAddScreenState extends State<CategoryAddScreen> {
+class _CategoryEditScreenState extends State<CategoryEditScreen> {
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   @override
+  void initState() {
+    super.initState();
+    titleController.text = widget.category.categoryTitle;
+    descriptionController.text = widget.category.description;
+  }
+  @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
-    addCategory() async {
+    updateCategory() async {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
-        Category category = Category(titleController.text, descriptionController.text);
-        await DbCategory.instance.saveCategory(category).then((categoryData) {
+        widget.category.categoryTitle= titleController.text;
+        widget.category.description= descriptionController.text;
+        await DbCategory.instance.updateCategory(widget.category).then((categoryData) {
           Navigator.pushNamedAndRemoveUntil(
               context, route.homeScreen, (Route<dynamic> route) => false);
         }).catchError((error) {
@@ -58,8 +63,8 @@ class _CategoryAddScreenState extends State<CategoryAddScreen> {
                 ),
                 SizedBox(height: size.height * 0.03),
                 RoundedButton(
-                  text: "Save",
-                  press: addCategory,
+                  text: "Update",
+                  press: updateCategory,
                 ),
                 SizedBox(height: size.height * 0.1),
                 // OrDivider(),

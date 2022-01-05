@@ -29,24 +29,23 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   login() async {
-    String username = usernameController.text;
-    String password = passwordController.text;
-
-    if(_formKey.currentState!.validate()){
+    if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      await DbAdmin.instance.getLoginData(username, password).then((adminData) {
+      await DbAdmin.instance
+          .getLoginData(usernameController.text, passwordController.text)
+          .then((adminData) {
         if (adminData != null) {
           setSP(adminData).whenComplete(() {
             Navigator.pushNamedAndRemoveUntil(
                 context, route.homeScreen, (Route<dynamic> route) => false);
           });
         } else {
-          alertDialog(context, 'Error: User Not Found', 1);
+          alertDialog(context, 'User Not Found', 1);
         }
       }).catchError((error) {
-        alertDialog(context, 'Error: Login Fail', 1);
+        alertDialog(context, 'Login Fail', 1);
       });
-    }else{
+    } else {
       alertDialog(context, 'Check your data', 1);
     }
   }
@@ -75,7 +74,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 RoundedPasswordField(
                   controller: passwordController,
-                  onChanged: (value) {},
                 ),
                 RoundedButton(text: "LOGIN", press: login),
                 SizedBox(height: size.height * 0.03),

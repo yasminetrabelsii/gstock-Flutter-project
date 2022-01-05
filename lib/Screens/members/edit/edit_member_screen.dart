@@ -8,8 +8,8 @@ import 'package:gstock/routes/route.dart' as route;
 import 'package:gstock/components/appbar_widget.dart';
 
 class MemberEditScreen extends StatefulWidget {
-  const MemberEditScreen({Key? key}) : super(key: key);
-
+  late Members? member;
+  MemberEditScreen({Key? key, this.member}) : super(key: key);
   @override
   _MemberEditScreenState createState() => _MemberEditScreenState();
 }
@@ -23,8 +23,21 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
   final phoneController = TextEditingController();
   final adresseController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  final _formKey2 = GlobalKey<FormState>();
   late Members members;
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      if (widget.member != null) {
+        cinController.text = widget.member!.cin;
+        firstNameController.text = widget.member!.firstName;
+        lastNameController.text = widget.member!.lastName;
+        emailController.text = widget.member!.email;
+        phoneController.text = widget.member!.phone;
+        adresseController.text = widget.member!.adresse;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,12 +46,12 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
     updateMember() async {
       if (_formKey.currentState!.validate()) {
         _formKey.currentState!.save();
-            members.cin=cinController.text;
-            members.firstName=firstNameController.text;
-            members.lastName=lastNameController.text;
-            members.email=emailController.text;
-            members.phone=phoneController.text;
-            members.adresse= adresseController.text;
+        members.cin = cinController.text;
+        members.firstName = firstNameController.text;
+        members.lastName = lastNameController.text;
+        members.email = emailController.text;
+        members.phone = phoneController.text;
+        members.adresse = adresseController.text;
         await DbMembers.instance.updateMember(members).then((memberData) {
           Navigator.pushNamedAndRemoveUntil(
               context, route.homeScreen, (Route<dynamic> route) => false);
@@ -47,52 +60,15 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
         });
       }
     }
-    getMember() async {
-      if (_formKey2.currentState!.validate()) {
-        _formKey2.currentState!.save();
-        await DbMembers.instance.getMemberByCin(cinFindController.text).then((memberData) {
-            setState(() {
-              members = memberData!;
-              cinController.text = memberData.cin;
-              firstNameController.text =memberData.firstName;
-              lastNameController.text = memberData.lastName;
-              emailController.text = memberData.email;
-              phoneController.text = memberData.phone;
-              adresseController.text = memberData.adresse;
-            });
-        }).catchError((error) {
-          alertDialog(context, 'Error: User not found', 1);
-        });
-      }
-    }
+
     return Scaffold(
-      appBar: buildAppBar(context, "Edit Member"),
+      appBar: buildAppBar(
+        context,
+        "Edit Member",
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Form(
-                key: _formKey2,
-                child: Column(
-                  children: [
-                    SizedBox(height: size.height * 0.03),
-                    const Text(
-                      'Find Member',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 3.0),
-                    ),
-                    RoundedInputField(
-                      controller: cinFindController,
-                      hintText: "Cin",
-                      icon: Icons.credit_card,
-                      inputType: TextInputType.phone,
-                    ),
-                    RoundedButton(
-                      text: "Search",
-                      press: getMember,
-                    ),
-                  ],
-                )),
             Center(
               child: Form(
                 key: _formKey,
@@ -137,7 +113,7 @@ class _MemberEditScreenState extends State<MemberEditScreen> {
                     RoundedInputField(
                       controller: adresseController,
                       hintText: "adresse",
-                      icon: Icons.location_on ,
+                      icon: Icons.location_on,
                     ),
                     SizedBox(height: size.height * 0.03),
                     RoundedButton(

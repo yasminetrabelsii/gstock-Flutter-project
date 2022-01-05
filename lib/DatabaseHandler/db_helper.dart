@@ -13,6 +13,7 @@ class DbHelper {
   static const String userName = 'userName';
   static const String email = 'email';
   static const String password = 'password';
+  static const String adminImage = 'adminImage';
 //table Category
   static const String tableCategory = 'category';
   static const String categoryId = 'categoryId';
@@ -24,6 +25,7 @@ class DbHelper {
   static const String productTitle = 'productTitle';
   static const String quantity = 'quantity';
   static const String purchaseDate = 'purchaseDate';
+  static const String productImage = 'productImage';
 //table Members
   static const String tableMembers = 'members';
   static const String memberId = 'memberId';
@@ -71,7 +73,8 @@ class DbHelper {
         " $adminId INTEGER PRIMARY KEY autoincrement,"
         " $userName TEXT UNIQUE,"
         " $email TEXT UNIQUE,"
-        " $password TEXT"
+        " $password TEXT,"
+        " $adminImage TEXT"
         ")");
     await db.execute("CREATE TABLE $tableCategory ("
         " $categoryId INTEGER PRIMARY KEY autoincrement,"
@@ -84,7 +87,8 @@ class DbHelper {
         " $categoryId INTEGER NOT NULL,"
         " $quantity INTEGER,"
         " $purchaseDate TEXT,"
-        " FOREIGN KEY ($categoryId) REFERENCES $tableCategory ($categoryId) "
+        " $productImage TEXT,"
+        " FOREIGN KEY ($categoryId) REFERENCES $tableCategory ($categoryId) ON DELETE CASCADE "
         ")");
     await db.execute("CREATE TABLE $tableMembers ("
         " $memberId INTEGER PRIMARY KEY autoincrement,"
@@ -104,9 +108,9 @@ class DbHelper {
         " $isVerified TEXT,"
         " $dateOut TEXT,"
         " $dateBack TEXT,"
-        " FOREIGN KEY ($productId) REFERENCES $tableProduct ($productId),"
-        " FOREIGN KEY ($memberId) REFERENCES $tableMembers ($memberId),"
-        " FOREIGN KEY ($adminId) REFERENCES $tableAdmin ($adminId) "
+        " FOREIGN KEY ($productId) REFERENCES $tableProduct ($productId) ON DELETE RESTRICT,"
+        " FOREIGN KEY ($memberId) REFERENCES $tableMembers ($memberId) ON DELETE RESTRICT,"
+        " FOREIGN KEY ($adminId) REFERENCES $tableAdmin ($adminId) ON DELETE RESTRICT "
         ")");
     await db.execute("CREATE TABLE $tableLoanBack ("
         " $loanBackId INTEGER PRIMARY KEY autoincrement,"
@@ -115,9 +119,9 @@ class DbHelper {
         " $adminId INTEGER NOT NULL,"
         " $state TEXT,"
         " $dateVerification TEXT,"
-        " FOREIGN KEY ($loanId) REFERENCES $tableLoans ($loanId),"
-        " FOREIGN KEY ($memberId) REFERENCES $tableMembers ($memberId),"
-        " FOREIGN KEY ($adminId) REFERENCES $tableAdmin ($adminId) "
+        " FOREIGN KEY ($loanId) REFERENCES $tableLoans ($loanId) ON DELETE RESTRICT,"
+        " FOREIGN KEY ($memberId) REFERENCES $tableMembers ($memberId) ON DELETE RESTRICT,"
+        " FOREIGN KEY ($adminId) REFERENCES $tableAdmin ($adminId) ON DELETE RESTRICT "
         ")");
   }
 }

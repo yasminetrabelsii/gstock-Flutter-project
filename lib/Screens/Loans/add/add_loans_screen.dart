@@ -108,6 +108,7 @@ class _LoanAddScreenState extends State<LoanAddScreen> {
                   controller: _loanQuantityController,
                   hintText: "quantity loans",
                   icon: Icons.add_shopping_cart,
+                  inputType: TextInputType.number,
                   // onChanged: (value) {},
                 ),
                 SizedBox(height: size.height * 0.03),

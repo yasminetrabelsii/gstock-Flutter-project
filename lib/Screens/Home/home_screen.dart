@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:gstock/DatabaseHandler/product/db_product_opertation.dart';
 import 'package:gstock/Models/admin.dart';
 import 'package:gstock/components/custom_expansion_tile.dart';
+import 'package:gstock/components/custom_search_delegate.dart';
 import 'package:gstock/components/home_card.dart';
 import 'package:gstock/constants.dart';
 import 'package:gstock/components/appbar_widget.dart';
@@ -18,20 +22,44 @@ class _HomeScreenState extends State<HomeScreen> {
   GetStorage loginStorage = GetStorage(storeAdmin);
   late Admin admin = Admin.fromMap(loginStorage.read(adminData));
   int selectedIndex = 0;
+  List<Map<String, Object?>> products = [];
+
+  getProduct () async {
+    await DbProduct.instance.getProductsCategories().then((data) => {
+    setState(() {
+      products = data;
+    })
+    });
+  }
+  @override
+  void initState(){
+    getProduct();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-        appBar: buildAppBar(context, "Home Page"),
+        appBar: buildAppBar(
+          context,
+          "Home Page",
+          action: IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () {
+              showSearch(context: context, delegate: CustomSearchDelegate(products: products));
+            },
+          ),
+        ),
         drawer: Drawer(
           child: Center(
             child: ListView(
               children: [
                 UserAccountsDrawerHeader(
-                  currentAccountPicture: const CircleAvatar(
+                  currentAccountPicture: CircleAvatar(
                       radius: 80,
-                      backgroundImage: AssetImage('assets/images/user.png'),
+                      backgroundImage:
+                          MemoryImage(base64Decode(admin.adminImage)),
                       backgroundColor: Colors.transparent),
                   accountName: Text(
                     admin.userName,
@@ -104,26 +132,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       hintText: 'Add new Product',
                       icon: Icons.add,
                     ),
-                    RoundedExpansionField(
-                      onTap: () {
-                        Navigator.pushNamed(context, route.productAddScreen);
-                      },
-                      hintText: 'Edit Product',
-                      icon: Icons.edit,
-                    ),
                   ],
                 ),
                 ExpansionTile(
                   collapsedTextColor: kPrimaryColor,
                   textColor: kPrimaryColor,
                   iconColor: kPrimaryColor,
-                  title: const Text("Catagories"),
+                  title: const Text("Categories"),
                   children: <Widget>[
                     RoundedExpansionField(
                       onTap: () {
                         Navigator.pushNamed(context, route.categoryListScreen);
                       },
-                      hintText: 'List Catagories',
+                      hintText: 'List Categories',
                       icon: Icons.format_list_bulleted,
                     ),
                     RoundedExpansionField(
@@ -132,13 +153,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       hintText: 'Add new Category',
                       icon: Icons.add,
-                    ),
-                    RoundedExpansionField(
-                      onTap: () {
-                        Navigator.pushNamed(context, route.productAddScreen);
-                      },
-                      hintText: 'Edit Category',
-                      icon: Icons.edit,
                     ),
                   ],
                 ),
@@ -162,13 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       hintText: 'Add new Loan',
                       icon: Icons.add,
                     ),
-                    RoundedExpansionField(
-                      onTap: () {
-                        Navigator.pushNamed(context, route.productAddScreen);
-                      },
-                      hintText: 'Edit Loan',
-                      icon: Icons.edit,
-                    ),
                   ],
                 ),
                 ExpansionTile(
@@ -188,15 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () {
                         Navigator.pushNamed(context, route.loanBackAddScreen);
                       },
-                      hintText: 'Add new Loan Back',
+                      hintText: 'Loan Back',
                       icon: Icons.add,
-                    ),
-                    RoundedExpansionField(
-                      onTap: () {
-                        Navigator.pushNamed(context, route.productAddScreen);
-                      },
-                      hintText: 'Edit Loan Back',
-                      icon: Icons.edit,
                     ),
                   ],
                 ),

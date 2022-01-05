@@ -11,26 +11,37 @@ import 'package:gstock/components/rounded_date_filed.dart';
 import 'package:gstock/components/rounded_input_field.dart';
 import 'package:gstock/components/appbar_widget.dart';
 import 'package:gstock/routes/route.dart' as route;
+import 'package:intl/intl.dart';
 
-class ProductAddScreen extends StatefulWidget {
-  const ProductAddScreen({Key? key}) : super(key: key);
+class ProductEditScreen extends StatefulWidget {
+  final Product product;
+  final Category category;
+  const ProductEditScreen(
+      {Key? key, required this.product, required this.category})
+      : super(key: key);
 
   @override
-  State<ProductAddScreen> createState() => _ProductAddScreenState();
+  State<ProductEditScreen> createState() => _ProductEditScreenState();
 }
 
-class _ProductAddScreenState extends State<ProductAddScreen> {
+class _ProductEditScreenState extends State<ProductEditScreen> {
   late Category _selectedCategory;
   final titleController = TextEditingController();
   final quantityController = TextEditingController();
   final _purchaseDateController = TextEditingController();
   DateTime _purchaseDate = DateTime.now();
-  String? _imageFileBase64;
+  late String _imageFileBase64;
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    callback(widget.category);
+    titleController.text = widget.product.productTitle;
+    quantityController.text = widget.product.quantity.toString();
+    _purchaseDateController.text = DateFormat('yyyy-MM-dd').format(widget.product.purchaseDate);
+    _purchaseDate = widget.product.purchaseDate;
+    _imageFileBase64 = widget.product.productImage;
   }
 
   callback(selectedCategory) {
@@ -39,15 +50,18 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
     });
   }
 
-  addProduct() async {
+  updateProducts() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
       Product product = Product(
           titleController.text,
           _selectedCategory.categoryId,
           int.parse(quantityController.text),
-          _purchaseDate,_imageFileBase64!);
-      await DbProduct.instance.saveProduct(product).then((productData) {
+          _purchaseDate,
+          _imageFileBase64,
+      );
+      product.productId = widget.product.productId;
+      await DbProduct.instance.updateProduct(product).then((productData) {
         Navigator.pushNamedAndRemoveUntil(
             context, route.homeScreen, (Route<dynamic> route) => false);
       }).catchError((error) {
@@ -60,16 +74,23 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: buildAppBar(context, "Add New Product"),
+      appBar: buildAppBar(context, "Edit Product"),
       body: SingleChildScrollView(
         child: Center(
           child: Form(
             key: _formKey,
             child: Column(
               children: <Widget>[
-                ImagePickerWidget(isUserImage:false,callback: (String imageFileBase64) {setState(() {
-                  _imageFileBase64 = imageFileBase64;
-                });},),
+                ImagePickerWidget(
+                  isUserImage: false,
+                  isEdit: true,
+                  imageFileBase64: _imageFileBase64,
+                  callback: (String imageFileBase64) {
+                    setState(() {
+                      _imageFileBase64 = imageFileBase64;
+                    });
+                  },
+                ),
                 SizedBox(height: size.height * 0.03),
                 RoundedInputField(
                   controller: titleController,
@@ -81,7 +102,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
                 RoundedInputField(
                   controller: quantityController,
                   hintText: "quantity",
-                  icon: Icons.add_shopping_cart,
+                  icon: Icons.money,
                   inputType: TextInputType.number,
                 ),
                 SizedBox(height: size.height * 0.03),
@@ -89,8 +110,7 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
                   future: DbCategory.instance.getCategories(),
                   builder: (context, snapshot) {
                     return snapshot.hasData
-                        ? CategoriesDropDown(
-                            callback: callback, categories: snapshot.data)
+                        ? CategoriesDropDown(callback: callback, categories: snapshot.data)
                         : const Text('No categories');
                   },
                 ),
@@ -104,8 +124,8 @@ class _ProductAddScreenState extends State<ProductAddScreen> {
                 ),
                 SizedBox(height: size.height * 0.03),
                 RoundedButton(
-                  text: "Save",
-                  press: addProduct,
+                  text: "Update",
+                  press: updateProducts,
                 ),
                 SizedBox(height: size.height * 0.1),
                 // OrDivider(),

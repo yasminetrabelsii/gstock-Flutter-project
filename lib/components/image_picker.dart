@@ -1,50 +1,96 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gstock/constants.dart';
 import 'package:image_picker/image_picker.dart';
 
-
 class ImagePickerWidget extends StatefulWidget {
-  const ImagePickerWidget({Key? key}) : super(key: key);
+  final Function(String imageFileBase64) callback;
+  final bool isEdit,isUserImage;
+  final String imageFileBase64;
+  const ImagePickerWidget(
+      {Key? key,
+      required this.callback,
+      this.isEdit = false,
+      this.imageFileBase64 = "",
+      this.isUserImage = true
+      })
+      : super(key: key);
 
   @override
   ImagePickerState createState() => ImagePickerState();
 }
 
 class ImagePickerState extends State<ImagePickerWidget> {
-
-  File? _imageFile;
-  final _globalkey = GlobalKey<FormState>();
+  String? imageFileBase64;
+  final _selectImageController = TextEditingController();
+  @override
+  void initState() {
+    setState(() {
+      if(widget.isEdit) {
+        imageFileBase64 = widget.imageFileBase64;
+        _selectImageController.text = "Try Edit your Photo";
+      }
+    });
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
-    return imageProfile();
-  }
-
-  Widget imageProfile() {
-    return Center(
-      child: Stack(children: <Widget>[
-        CircleAvatar(
-          radius: 80.0,
-          backgroundImage: _imageFile == null ? const AssetImage('assets/images/user.png'):FileImage(_imageFile!) as ImageProvider,
-        ),
-        Positioned(
-          bottom: 20.0,
-          right: 20.0,
-          child: InkWell(
-            onTap: () {
-              showModalBottomSheet(
-                context: context,
-                builder: ((builder) => bottomSheet()),
-              );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Stack(children: <Widget>[
+          CircleAvatar(
+            radius: 80.0,
+            foregroundColor: Colors.transparent,
+            backgroundImage: imageFileBase64!=null ? MemoryImage(base64Decode(imageFileBase64!))
+                    : AssetImage(widget.isUserImage?'assets/images/user.png':'assets/images/addimage.png') as ImageProvider,
+          ),
+          Positioned(
+            bottom: 0,
+            right: 0,
+            child: InkWell(
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: ((builder) => bottomSheet()),
+                );
+              },
+              child: ClipOval(
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  color: kPrimaryColor,
+                  child: Icon(
+                    widget.isEdit ?  Icons.edit:Icons.add_a_photo ,
+                    color: Colors.white,
+                    size: 28.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.3,),
+          child: TextFormField(
+            controller: _selectImageController,
+            readOnly: true,
+            showCursor: false,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please choose a photo';
+              }
+              return null;
             },
-            child: const Icon(
-              Icons.camera_alt,
-              color: Colors.red,
-              size: 28.0,
+            style:TextStyle(color: widget.isEdit ? Colors.amberAccent: Colors.green),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
             ),
           ),
         ),
-      ]),
+      ],
     );
   }
 
@@ -59,28 +105,37 @@ class ImagePickerState extends State<ImagePickerWidget> {
       child: Column(
         children: <Widget>[
           const Text(
-            "Choose Profile photo",
-            style: TextStyle(
-              fontSize: 20.0,
-            ),
+            "Choose a photo",
+            style: TextStyle(fontSize: 20.0, color: kPrimaryColor),
           ),
           const SizedBox(
             height: 20,
           ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
             TextButton.icon(
-              icon: const Icon(Icons.camera),
-              onPressed: () {
-                takePhoto(ImageSource.camera);
-              },
-              label: const Text("Camera"),
-            ),
+                icon: const Icon(
+                  Icons.camera,
+                  color: kPrimaryColor,
+                ),
+                onPressed: () {
+                  takePhoto(ImageSource.camera);
+                },
+                label: const Text(
+                  "Camera",
+                  style: TextStyle(color: kPrimaryColor),
+                )),
             TextButton.icon(
-              icon: const Icon(Icons.image),
+              icon: const Icon(
+                Icons.image,
+                color: kPrimaryColor,
+              ),
               onPressed: () {
                 takePhoto(ImageSource.gallery);
               },
-              label: const Text("Gallery"),
+              label: const Text(
+                "Gallery",
+                style: TextStyle(color: kPrimaryColor),
+              ),
             ),
           ])
         ],
@@ -89,10 +144,14 @@ class ImagePickerState extends State<ImagePickerWidget> {
   }
 
   void takePhoto(ImageSource source) async {
+    File? _imageFile;
     final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile == null ) return;
+    if (pickedFile == null) return;
     setState(() {
       _imageFile = File(pickedFile.path);
+      imageFileBase64 = base64Encode(_imageFile!.readAsBytesSync());
+      widget.callback(imageFileBase64!);
+      _selectImageController.text = "Photo add Successful";
     });
   }
 }

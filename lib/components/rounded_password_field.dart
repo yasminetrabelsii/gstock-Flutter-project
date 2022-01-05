@@ -3,11 +3,9 @@ import 'package:gstock/components/text_field_container.dart';
 import 'package:gstock/constants.dart';
 
 class RoundedPasswordField extends StatefulWidget {
-  final ValueChanged<String> onChanged;
   final TextEditingController controller;
   const RoundedPasswordField({
     Key ?key,
-    required this.onChanged,
     required this.controller,
   }) : super(key: key);
 
@@ -22,7 +20,6 @@ class _RoundedPasswordFieldState extends State<RoundedPasswordField> {
     return TextFieldContainer(
       child: TextFormField(
         obscureText: _isObscure,
-        onChanged: widget.onChanged,
         controller: widget.controller,
         cursorColor: kPrimaryColor,
         validator: (value) {

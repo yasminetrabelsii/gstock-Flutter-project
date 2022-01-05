@@ -83,7 +83,7 @@ class _LoanBackAddScreen extends State<LoanBackAddScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: buildAppBar(context, "Add New Loan Back"),
+      appBar: buildAppBar(context, "Loan Back"),
       body: SingleChildScrollView(
         child: Center(
           child: Form(

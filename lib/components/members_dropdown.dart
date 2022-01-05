@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gstock/Models/members.dart';
 import 'package:gstock/components/text_field_container.dart';
-
 import 'package:gstock/constants.dart';
 
 class MembersDropDown extends StatefulWidget {
